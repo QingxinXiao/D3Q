@@ -36,7 +36,7 @@ def read_performance(path, attribute):
     return success_rate_new
 
 
-def show_model_performance(path, record_list=range(1, 4)):
+def show_model_performance(path, record_list=range(1, 6)):
     attributes = ['success_rate', 'ave_reward', 'ave_turns']
     records = {
         'success_rate': {'100': 0, '200': 0, '300': 0},
@@ -44,9 +44,7 @@ def show_model_performance(path, record_list=range(1, 4)):
         'ave_turns': {'100': 0, '200': 0, '300': 0}
     }
     for i in record_list:
-        print "in"
-        print '-----------------{}_{}'
-        data = json.load(open('{}_{}/agt_9_performance_records.json'.format(path, i), 'rb'))
+        data = json.load(open('{}_{}/age_9_performance_records.json'.format(path, i), 'rb'))
         for attribute in records.keys():
             records[attribute]['100'] += data[attribute]['100'] / len(record_list)
             records[attribute]['200'] += data[attribute]['200'] / len(record_list)
@@ -56,13 +54,15 @@ def show_model_performance(path, record_list=range(1, 4)):
     return records
 
 
-def draw(color, marker, linestyle, record_list=range(1,4), model_path="", attribute="success_rate"):
+def draw(color, marker, linestyle, record_list=range(1, 6), model_path="", attribute="success_rate"):
     datapoints = []
-    print record_list
+    # print record_list
     for i in record_list:
         # print '{}_{}-------------------'
+
         datapoints.append(
-            read_performance('{}_{}/agt_8_performance_records.json'.format(model_path, i), attribute))
+            read_performance('{}_{}/agt_9_performance_records.json'.format(model_path, i), attribute))
+        print '{}_{}/performance.json'.format(model_path, i)
 
 
     min_len = min(len(i) for i in datapoints)
@@ -82,32 +82,34 @@ def main(params):
     linestyles = ['solid', 'dashed', 'dashdot', 'dotted', '-.', '--', '-', ':']
     global_idx = 1500
 
-    print "1"
-
     # example
     model_path_list = [
-        './deep_dialog/checkpoints/dqn_1',
-        './deep_dialog/checkpoints/dqn_5',
-        './deep_dialog/checkpoints/ddq_5',
-        './deep_dialog/checkpoints/d3q_rnn_5'
+        # './deep_dialog/checkpoints/dqn_1',
+        # './deep_dialog/checkpoints/dqn_5',
+        # './deep_dialog/checkpoints/ddq_5',
+        # './deep_dialog/checkpoints/d3q_rnn_5'
+        # 'points/convlab2',
+        # 'points/erl'
+        'DDQ/dqn',
+
     ]
-    label_list = ['DQN(1)', 'DQN(5)', 'DDQ(5)', 'D3Q']
-    # print label_list
+    # label_list = ['DQN(1)', 'DQN(5)', 'DDQ(5)', 'D3Q']
+    label_list = ['DQN', 'PPO', 'ERL']
     curve_list = []
     for i, model in enumerate(model_path_list):
-        print i, model
-        record_list = range(1, 4)
+        # print i, model
+        record_list = range(1, 6)
         curve_list.append(draw(model_path=model, color=colors[i], marker=markers[i],
                                linestyle=linestyles[i], record_list=record_list))
-        print curve_list
+        # print curve_list
 
     plt.grid(True)
     plt.ylabel('Success rate')
     plt.xlabel('Epoch')
-    plt.legend(curve_list, label_list, loc=4)
-    plt.xlim([0, 250])
+    plt.legend(curve_list, label_list, loc=1)
+    plt.xlim([0, 500])
     plt.ylim([0, 0.9])
-    plt.savefig('./test.pdf', format='pdf')
+    plt.savefig('./ddq.pdf', format='pdf')
 
 
 if __name__ == "__main__":
